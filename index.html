@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Java Operators - Buzzer Challenge</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top,#263c78,#111936 55%,#050812);
+    color:white;
+    overflow-x:hidden;
+}
+
+/* HEADER */
+header{
+    text-align:center;
+    padding:20px 10px 12px;
+}
+
+header h1{
+    font-size:clamp(28px,5vw,52px);
+    color:#ffd700;
+    text-shadow:0 0 15px #ffd700;
+}
+
+header p{
+    margin-top:6px;
+    color:#dce6ff;
+    font-size:18px;
+}
+
+/* SCOREBOARD */
+.scoreboard{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    margin:15px auto;
+    max-width:850px;
+}
+
+.team{
+    width:230px;
+    padding:15px;
+    border-radius:20px;
+    text-align:center;
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 15px rgba(255,255,255,.15);
+    transition:.3s;
+}
+
+.team.red{
+    border:3px solid #ff4040;
+}
+
+.team.blue{
+    border:3px solid #3fa9ff;
+}
+
+.team h2{
+    font-size:22px;
+}
+
+.score{
+    font-size:48px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.red .score{
+    color:#ff5050;
+    text-shadow:0 0 15px red;
+}
+
+.blue .score{
+    color:#4db5ff;
+    text-shadow:0 0 15px #008cff;
+}
+
+/* GAME AREA */
+.game{
+    width:min(900px,94%);
+    margin:15px auto;
+    padding:25px;
+    border-radius:25px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.2);
+    box-shadow:0 0 30px rgba(0,0,0,.5);
+}
+
+.question-info{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+    font-weight:bold;
+}
+
+.progress{
+    width:100%;
+    height:10px;
+    background:#222b49;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.progress-bar{
+    height:100%;
+    width:5%;
+    background:linear-gradient(90deg,#ffd700,#ff8c00);
+    transition:.5s;
+}
+
+/* TIMER */
+.timer-box{
+    text-align:center;
+    margin:10px;
+}
+
+.timer{
+    width:85px;
+    height:85px;
+    margin:auto;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:bold;
+    border:6px solid #ffd700;
+    box-shadow:0 0 20px #ffd700;
+    transition:.3s;
+}
+
+.timer.danger{
+    border-color:#ff2020;
+    color:#ff3030;
+    box-shadow:0 0 25px red;
+    animation:pulse .5s infinite alternate;
+}
+
+@keyframes pulse{
+    from{transform:scale(1);}
+    to{transform:scale(1.08);}
+}
+
+/* QUESTION */
+.question{
+    text-align:center;
+    font-size:clamp(20px,3vw,29px);
+    line-height:1.4;
+    padding:20px;
+    color:#fff;
+    min-height:90px;
+}
+
+/* OPTIONS */
+.options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    margin-top:15px;
+}
+
+.option{
+    padding:17px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    color:white;
+    background:linear-gradient(135deg,#24335e,#16213f);
+    border:2px solid #52638e;
+    font-size:17px;
+    transition:.25s;
+}
+
+.option:hover{
+    transform:translateY(-4px);
+    border-color:#ffd700;
+    box-shadow:0 0 15px #ffd700;
+}
+
+.option.correct{
+    background:#16863c;
+    border-color:#55ff9a;
+    box-shadow:0 0 25px #28ff72;
+}
+
+.option.wrong{
+    background:#a51f2c;
+    border-color:#ff5968;
+    box-shadow:0 0 20px red;
+}
+
+/* BUZZER */
+.buzzer-area{
+    text-align:center;
+    margin-top:25px;
+}
+
+.buzzer-title{
+    color:#ffd700;
+    margin-bottom:12px;
+    font-size:18px;
+}
+
+.buzzers{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+}
+
+.buzzer{
+    width:210px;
+    height:90px;
+    border:none;
+    border-radius:20px;
+    color:white;
+    font-size:25px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.red-buzzer{
+    background:linear-gradient(#ff4848,#a50000);
+    box-shadow:0 7px 0 #620000,0 0 25px rgba(255,0,0,.5);
+}
+
+.blue-buzzer{
+    background:linear-gradient(#49b5ff,#0056a8);
+    box-shadow:0 7px 0 #003c75,0 0 25px rgba(0,130,255,.5);
+}
+
+.buzzer:hover{
+    transform:scale(1.05);
+}
+
+.buzzer:active{
+    transform:translateY(7px);
+    box-shadow:none;
+}
+
+.buzzer.locked{
+    opacity:.35;
+    pointer-events:none;
+}
+
+#status{
+    margin-top:15px;
+    font-size:18px;
+    min-height:25px;
+    color:#ffd700;
+}
+
+/* CONTROLS */
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:25px;
+}
+
+.control{
+    padding:13px 20px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+    color:white;
+    background:#39466e;
+}
+
+.control:hover{
+    background:#566797;
+}
+
+#soundBtn{
+    background:#0e8545;
+}
+
+/* FLOWERS */
+.flower{
+    position:fixed;
+    top:-60px;
+    z-index:1000;
+    pointer-events:none;
+    font-size:25px;
+    animation:fall linear forwards;
+}
+
+@keyframes fall{
+    0%{
+        transform:translateY(-60px) rotate(0deg);
+        opacity:1;
+    }
+    100%{
+        transform:translateY(110vh) rotate(720deg);
+        opacity:.2;
+    }
+}
+
+/* FLASH */
+.flash{
+    position:fixed;
+    inset:0;
+    background:white;
+    z-index:900;
+    pointer-events:none;
+    animation:flash .35s forwards;
+}
+
+@keyframes flash{
+    0%{opacity:.8}
+    100%{opacity:0}
+}
+
+/* FINAL SCREEN */
+.final-screen{
+    display:none;
+    width:min(700px,92%);
+    margin:30px auto;
+    padding:40px 20px;
+    text-align:center;
+    border-radius:30px;
+    background:rgba(255,255,255,.1);
+    border:2px solid #ffd700;
+    box-shadow:0 0 40px rgba(255,215,0,.3);
+}
+
+.trophy{
+    font-size:80px;
+    animation:bounce 1s infinite alternate;
+}
+
+@keyframes bounce{
+    from{transform:translateY(0)}
+    to{transform:translateY(-15px)}
+}
+
+.final-screen h2{
+    font-size:40px;
+    color:#ffd700;
+    margin:15px;
+}
+
+.final-score{
+    font-size:25px;
+    line-height:2;
+}
+
+/* START SCREEN */
+.start-screen{
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    background:
+        radial-gradient(circle,#243e80,#080d20);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:20px;
+}
+
+.start-box{
+    max-width:650px;
+    padding:40px 25px;
+    border-radius:30px;
+    background:rgba(255,255,255,.1);
+    border:2px solid #ffd700;
+    box-shadow:0 0 40px rgba(255,215,0,.25);
+}
+
+.start-box h1{
+    font-size:clamp(32px,6vw,58px);
+    color:#ffd700;
+    text-shadow:0 0 20px #ffd700;
+}
+
+.start-box p{
+    font-size:19px;
+    margin:20px 0;
+    line-height:1.6;
+}
+
+.start-btn{
+    padding:17px 40px;
+    font-size:22px;
+    font-weight:bold;
+    color:#111;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(90deg,#ffd700,#ff9d00);
+    cursor:pointer;
+    box-shadow:0 0 25px #ffd700;
+}
+
+.start-btn:hover{
+    transform:scale(1.06);
+}
+
+/* MOBILE */
+@media(max-width:650px){
+    .scoreboard{
+        gap:10px;
+    }
+
+    .team{
+        width:45%;
+    }
+
+    .score{
+        font-size:38px;
+    }
+
+    .options{
+        grid-template-columns:1fr;
+    }
+
+    .buzzers{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .buzzer{
+        width:90%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- START SCREEN -->
+<div class="start-screen" id="startScreen">
+    <div class="start-box">
+        <h1>⚡ JAVA OPERATOR<br>BUZZER CHALLENGE ⚡</h1>
+
+        <p>
+            🧠 20 MCQ Questions<br>
+            🔴 Red Team vs 🔵 Blue Team<br>
+            🔔 Fastest Buzzer Gets the Chance!<br>
+            🌸 Correct Answer = Flower Shower!
+        </p>
+
+        <button class="start-btn" onclick="startGame()">
+            🚀 START CHALLENGE
+        </button>
+    </div>
+</div>
+
+<header>
+    <h1>☕ JAVA OPERATOR CHALLENGE ⚡</h1>
+    <p>🔔 THINK • BUZZ • ANSWER • WIN! 🏆</p>
+</header>
+
+<div class="scoreboard">
+
+    <div class="team red">
+        <h2>🔴 RED TEAM</h2>
+        <div class="score" id="redScore">0</div>
+    </div>
+
+    <div class="team blue">
+        <h2>🔵 BLUE TEAM</h2>
+        <div class="score" id="blueScore">0</div>
+    </div>
+
+</div>
+
+<div class="game" id="gameArea">
+
+    <div class="question-info">
+        <span id="questionNumber">Question 1 of 20</span>
+        <span id="answeredText">0 / 20</span>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="timer-box">
+        <div class="timer" id="timer">15</div>
+    </div>
+
+    <div class="question" id="question">
+        Question appears here
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div class="buzzer-area">
+
+        <div class="buzzer-title">
+            ⚡ FIRST TEAM TO BUZZ GETS THE CHANCE!
+        </div>
+
+        <div class="buzzers">
+
+            <button class="buzzer red-buzzer" id="redBuzz"
+                    onclick="buzz('red')">
+                🔴 BUZZ!
+            </button>
+
+            <button class="buzzer blue-buzzer" id="blueBuzz"
+                    onclick="buzz('blue')">
+                🔵 BUZZ!
+            </button>
+
+        </div>
+
+        <div id="status">
+            Waiting for the fastest team...
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <button class="control" id="soundBtn"
+                onclick="enableSound()">
+            🔊 ENABLE SOUND
+        </button>
+
+        <button class="control"
+                onclick="nextQuestion()">
+            ➡️ NEXT QUESTION
+        </button>
+
+        <button class="control"
+                onclick="restartGame()">
+            🔄 RESTART
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FINAL SCREEN -->
+
+<div class="final-screen" id="finalScreen">
+
+    <div class="trophy">🏆</div>
+
+    <h2 id="winnerText">WINNER!</h2>
+
+    <div class="final-score">
+        🔴 Red Team: <b id="finalRed">0</b><br>
+        🔵 Blue Team: <b id="finalBlue">0</b>
+    </div>
+
+    <p style="margin:20px 0;font-size:20px;">
+        🎉 Fantastic Performance! 🎉
+    </p>
+
+    <button class="start-btn" onclick="restartGame()">
+        🔄 PLAY AGAIN
+    </button>
+
+</div>
+
+<script>
+
+/* =========================
+   QUESTION BANK
+========================= */
+
+const questions = [
+
+{
+q:"Which operator is used to add two values in Java?",
+options:["-","+","*","/"],
+answer:1
+},
+
+{
+q:"Which operator is used for subtraction?",
+options:["+","-","%","++"],
+answer:1
+},
+
+{
+q:"Which operator is used for multiplication?",
+options:["*","x","%","//"],
+answer:0
+},
+
+{
+q:"Which operator gives the remainder after division?",
+options:["/","%","//","rem"],
+answer:1
+},
+
+{
+q:"What is the result of 10 / 2 in Java?",
+options:["2","5","8","20"],
+answer:1
+},
+
+{
+q:"Which operator checks whether two values are equal?",
+options:["=","==","!=","==="],
+answer:1
+},
+
+{
+q:"Which operator means NOT EQUAL TO?",
+options:["<>","!=","==","!"],
+answer:1
+},
+
+{
+q:"Which operator means GREATER THAN?",
+options:["<",">","==","<="],
+answer:1
+},
+
+{
+q:"Which operator means LESS THAN OR EQUAL TO?",
+options:["<=",">=","<>","=="],
+answer:0
+},
+
+{
+q:"Which operator is used to assign a value to a variable?",
+options:["==","=","!=","=>"],
+answer:1
+},
+
+{
+q:"What does ++ do in Java?",
+options:[
+"Decreases by 1",
+"Increases by 1",
+"Multiplies by 2",
+"Divides by 2"
+],
+answer:1
+},
+
+{
+q:"What does -- do in Java?",
+options:[
+"Increases by 1",
+"Decreases by 1",
+"Adds 2",
+"Subtracts 2"
+],
+answer:1
+},
+
+{
+q:"Which is the logical AND operator in Java?",
+options:["&","&&","||","!"],
+answer:1
+},
+
+{
+q:"Which is the logical OR operator in Java?",
+options:["&&","|","||","!"],
+answer:2
+},
+
+{
+q:"Which operator represents logical NOT?",
+options:["!","!=","~","not"],
+answer:0
+},
+
+{
+q:"What is the result of 7 % 3?",
+options:["1","2","3","0"],
+answer:1
+},
+
+{
+q:"Which operator is used to add a value to a variable and assign the result?",
+options:["+=","=+","++=","=="],
+answer:0
+},
+
+{
+q:"Which operator is used to subtract a value from a variable and assign the result?",
+options:["=-","-=","--=","-=="],
+answer:1
+},
+
+{
+q:"Which operator has the highest priority among these?",
+options:["+","*","=","||"],
+answer:1
+},
+
+{
+q:"What is the value of x after: int x = 5; x += 3; ?",
+options:["2","3","8","15"],
+answer:2
+}
+
+];
+
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let currentQuestion = 0;
+let redScore = 0;
+let blueScore = 0;
+
+let buzzerTeam = null;
+let answered = false;
+let timerValue = 15;
+let timerInterval = null;
+let soundEnabled = false;
+
+
+/* =========================
+   SOUND
+========================= */
+
+let audioContext;
+
+function enableSound(){
+
+    soundEnabled = true;
+
+    document.getElementById("soundBtn").innerText =
+        "🔊 SOUND ON ✓";
+
+    try{
+        audioContext =
+            new (window.AudioContext ||
+            window.webkitAudioContext)();
+
+        beep(600,0.15);
+    }catch(e){}
+}
+
+
+function beep(frequency,duration){
+
+    if(!soundEnabled || !audioContext) return;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = "sine";
+
+    gain.gain.setValueAtTime(
+        0.15,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioContext.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + duration
+    );
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame(){
+
+    document.getElementById("startScreen").style.display="none";
+
+    loadQuestion();
+
+    if(!soundEnabled){
+        soundEnabled=true;
+
+        try{
+            audioContext =
+                new (window.AudioContext ||
+                window.webkitAudioContext)();
+        }catch(e){}
+    }
+}
+
+
+/* =========================
+   LOAD QUESTION
+========================= */
+
+function loadQuestion(){
+
+    clearInterval(timerInterval);
+
+    buzzerTeam = null;
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber").innerText =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+    document.getElementById("answeredText").innerText =
+        `${currentQuestion} / ${questions.length}`;
+
+    document.getElementById("question").innerText =
+        q.q;
+
+    const progress =
+        ((currentQuestion + 1) / questions.length) * 100;
+
+    document.getElementById("progressBar").style.width =
+        progress + "%";
+
+    document.getElementById("status").innerText =
+        "⚡ FIRST TEAM TO BUZZ GETS THE CHANCE!";
+
+    document.getElementById("redBuzz").classList.remove("locked");
+    document.getElementById("blueBuzz").classList.remove("locked");
+
+    const options =
+        document.getElementById("options");
+
+    options.innerHTML="";
+
+    q.options.forEach((option,index)=>{
+
+        const button =
+            document.createElement("button");
+
+        button.className="option";
+
+        button.innerText =
+            String.fromCharCode(65+index) +
+            ". " +
+            option;
+
+        button.onclick =
+            () => checkAnswer(index);
+
+        options.appendChild(button);
+
+    });
+
+    startTimer();
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer(){
+
+    timerValue=15;
+
+    const timer =
+        document.getElementById("timer");
+
+    timer.innerText=timerValue;
+    timer.classList.remove("danger");
+
+    timerInterval =
+        setInterval(()=>{
+
+            timerValue--;
+
+            timer.innerText=timerValue;
+
+            if(timerValue<=5){
+                timer.classList.add("danger");
+                beep(300,0.08);
+            }
+
+            if(timerValue<=0){
+
+                clearInterval(timerInterval);
+
+                if(!answered){
+
+                    answered=true;
+
+                    document.getElementById("status").innerText =
+                        "⏰ TIME UP!";
+
+                    lockBuzzers();
+
+                    revealAnswer();
+                }
+            }
+
+        },1000);
+}
+
+
+/* =========================
+   BUZZER
+========================= */
+
+function buzz(team){
+
+    if(buzzerTeam || answered) return;
+
+    buzzerTeam=team;
+
+    lockBuzzers();
+
+    const teamName =
+        team==="red"
+        ? "🔴 RED TEAM"
+        : "🔵 BLUE TEAM";
+
+    document.getElementById("status").innerText =
+        `🚨 ${teamName} BUZZED FIRST!`;
+
+    beep(
+        team==="red" ? 180 : 700,
+        .35
+    );
+
+    flashScreen();
+}
+
+
+function lockBuzzers(){
+
+    document.getElementById("redBuzz")
+        .classList.add("locked");
+
+    document.getElementById("blueBuzz")
+        .classList.add("locked");
+}
+
+
+/* =========================
+   ANSWER CHECK
+========================= */
+
+function checkAnswer(selected){
+
+    if(answered) return;
+
+    if(!buzzerTeam){
+
+        document.getElementById("status").innerText =
+            "🔔 BUZZ FIRST BEFORE ANSWERING!";
+
+        beep(150,.15);
+
+        return;
+    }
+
+    answered=true;
+
+    clearInterval(timerInterval);
+
+    const correct =
+        questions[currentQuestion].answer;
+
+    const optionButtons =
+        document.querySelectorAll(".option");
+
+    optionButtons[correct]
+        .classList.add("correct");
+
+    if(selected === correct){
+
+        if(buzzerTeam==="red"){
+            redScore++;
+            document.getElementById("redScore")
+                .innerText=redScore;
+        }else{
+            blueScore++;
+            document.getElementById("blueScore")
+                .innerText=blueScore;
+        }
+
+        document.getElementById("status").innerText =
+            `🌟 CORRECT! ${buzzerTeam==="red" ? "RED" : "BLUE"} TEAM +1`;
+
+        beep(900,.15);
+        setTimeout(()=>beep(1200,.25),120);
+
+        flowerShower();
+
+    }else{
+
+        optionButtons[selected]
+            .classList.add("wrong");
+
+        document.getElementById("status").innerText =
+            "❌ WRONG ANSWER!";
+
+        beep(180,.35);
+    }
+
+    revealAnswer();
+}
+
+
+/* =========================
+   REVEAL ANSWER
+========================= */
+
+function revealAnswer(){
+
+    const correct =
+        questions[currentQuestion].answer;
+
+    const buttons =
+        document.querySelectorAll(".option");
+
+    buttons[correct].classList.add("correct");
+}
+
+
+/* =========================
+   FLOWER SHOWER
+========================= */
+
+function flowerShower(){
+
+    const flowers=[
+        "🌸",
+        "🌺",
+        "🌼",
+        "🌻",
+        "💐",
+        "🌷",
+        "🪻",
+        "🌹"
+    ];
+
+    for(let i=0;i<70;i++){
+
+        setTimeout(()=>{
+
+            const flower =
+                document.createElement("div");
+
+            flower.className="flower";
+
+            flower.innerText =
+                flowers[
+                    Math.floor(
+                        Math.random()*flowers.length
+                    )
+                ];
+
+            flower.style.left =
+                Math.random()*100+"vw";
+
+            flower.style.fontSize =
+                (18 + Math.random()*28)+"px";
+
+            flower.style.animationDuration =
+                (2 + Math.random()*3)+"s";
+
+            document.body.appendChild(flower);
+
+            setTimeout(()=>{
+                flower.remove();
+            },5500);
+
+        },i*25);
+    }
+}
+
+
+/* =========================
+   SCREEN FLASH
+========================= */
+
+function flashScreen(){
+
+    const flash =
+        document.createElement("div");
+
+    flash.className="flash";
+
+    document.body.appendChild(flash);
+
+    setTimeout(()=>{
+        flash.remove();
+    },400);
+}
+
+
+/* =========================
+   NEXT QUESTION
+========================= */
+
+function nextQuestion(){
+
+    if(!answered){
+
+        document.getElementById("status").innerText =
+            "⚠️ Answer the current question first!";
+
+        return;
+    }
+
+    currentQuestion++;
+
+    if(currentQuestion >= questions.length){
+
+        showFinalScreen();
+
+    }else{
+
+        loadQuestion();
+    }
+}
+
+
+/* =========================
+   FINAL SCREEN
+========================= */
+
+function showFinalScreen(){
+
+    clearInterval(timerInterval);
+
+    document.getElementById("gameArea").style.display="none";
+
+    document.getElementById("finalScreen").style.display="block";
+
+    document.getElementById("finalRed").innerText =
+        redScore;
+
+    document.getElementById("finalBlue").innerText =
+        blueScore;
+
+    let winner;
+
+    if(redScore > blueScore){
+
+        winner="🔴 RED TEAM WINS!";
+
+    }else if(blueScore > redScore){
+
+        winner="🔵 BLUE TEAM WINS!";
+
+    }else{
+
+        winner="🤝 IT'S A DRAW!";
+    }
+
+    document.getElementById("winnerText")
+        .innerText=winner;
+
+    flowerShower();
+
+    setTimeout(flowerShower,1500);
+}
+
+
+/* =========================
+   RESTART
+========================= */
+
+function restartGame(){
+
+    clearInterval(timerInterval);
+
+    currentQuestion=0;
+    redScore=0;
+    blueScore=0;
+    buzzerTeam=null;
+    answered=false;
+
+    document.getElementById("redScore").innerText="0";
+    document.getElementById("blueScore").innerText="0";
+
+    document.getElementById("gameArea").style.display="block";
+
+    document.getElementById("finalScreen").style.display="none";
+
+    document.getElementById("startScreen").style.display="none";
+
+    loadQuestion();
+}
+
+
+/* =========================
+   KEYBOARD BUZZERS
+========================= */
+
+document.addEventListener("keydown",(event)=>{
+
+    if(event.key.toLowerCase()==="r"){
+        buzz("red");
+    }
+
+    if(event.key.toLowerCase()==="b"){
+        buzz("blue");
+    }
+
+    if(event.key.toLowerCase()==="n"){
+        nextQuestion();
+    }
+
+});
+
+
+</script>
+
+</body>
+</html>
